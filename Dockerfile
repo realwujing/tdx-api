@@ -1,6 +1,6 @@
 # 多阶段构建 - 第一阶段：构建
-# 使用DaoCloud镜像加速
-FROM m.daocloud.io/docker.io/library/golang:1.22-alpine AS builder
+# 使用官方镜像（如果国内拉取慢，可以配置docker daemon的registry-mirrors）
+FROM golang:1.22-alpine AS builder
 
 # 替换Alpine镜像源为阿里云
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
@@ -27,8 +27,7 @@ COPY . .
 RUN go mod tidy && (cd web && go build -ldflags="-s -w" -o ../stock-web .)
 
 # 多阶段构建 - 第二阶段：运行
-# 使用DaoCloud镜像加速
-FROM m.daocloud.io/docker.io/library/alpine:latest
+FROM alpine:latest
 
 # 替换Alpine镜像源为阿里云，安装必要的运行时依赖
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
